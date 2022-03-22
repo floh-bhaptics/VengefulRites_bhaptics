@@ -14,6 +14,7 @@ namespace VengefulRites_bhaptics
     public class VengefulRites_bhaptics : MelonMod
     {
         public static TactsuitVR tactsuitVr;
+        public static bool bladeInRightHand = true;
 
         public override void OnApplicationStart()
         {
@@ -23,17 +24,161 @@ namespace VengefulRites_bhaptics
         }
 
         [HarmonyPatch(typeof(PlayerWeapon), "OnTriggerEnter", new Type[] { typeof(Collider) })]
-        public class bhaptics_PlayerWeaponCollide
+        public class bhaptics_PlayerWeaponDrawBlood
         {
             [HarmonyPostfix]
             public static void Postfix(PlayerWeapon __instance, Collider other)
+            {
+                if (!__instance.inHand) return;
+                if (!other.CompareTag("Enemy")) return;
+                float intensity = 1.0f;
+                if (!__instance.fastEnough) intensity *= 0.6f;
+                if (!__instance.farEnough) intensity *= 0.6f;
+                bool isRight = __instance.rightWeapon;
+                tactsuitVr.Recoil("Blade", bladeInRightHand, intensity);
+            }
+        }
+
+        [HarmonyPatch(typeof(PlayerWeapon), "Parry", new Type[] { })]
+        public class bhaptics_PlayerWeaponParry
+        {
+            [HarmonyPostfix]
+            public static void Postfix(PlayerWeapon __instance)
+            {
+                if (!__instance.inHand) return;
+                // tactsuitVr.LOG("Parry: " + __instance.rightWeapon.ToString());
+                bool isRight = __instance.rightWeapon;
+                tactsuitVr.Recoil("Blade", bladeInRightHand);
+            }
+        }
+
+        /*
+        [HarmonyPatch(typeof(PlayerWeapon), "PlushieHit", new Type[] { })]
+        public class bhaptics_PlayerWeaponPlushieHit
+        {
+            [HarmonyPostfix]
+            public static void Postfix(PlayerWeapon __instance)
+            {
+                if (!__instance.inHand) return;
+                // tactsuitVr.LOG("Plushie: " + __instance.rightWeapon.ToString());
+                bool isRight = __instance.rightWeapon;
+                tactsuitVr.Recoil("Blade", isRight, 0.2f);
+            }
+        }
+
+        [HarmonyPatch(typeof(PlayerWeapon), "WeakHit", new Type[] { })]
+        public class bhaptics_PlayerWeaponWeakHit
+        {
+            [HarmonyPostfix]
+            public static void Postfix(PlayerWeapon __instance)
+            {
+                if (!__instance.inHand) return;
+                // tactsuitVr.LOG("Weak: " + __instance.rightWeapon.ToString());
+                bool isRight = __instance.rightWeapon;
+                tactsuitVr.Recoil("Blade", isRight, 0.4f);
+            }
+        }
+        */
+        /*
+        [HarmonyPatch(typeof(PlayerWeapon), "ApplyEffect", new Type[] { typeof(EnemyController), typeof(Transform), typeof(float) })]
+        public class bhaptics_PlayerWeaponApplyEffect
+        {
+            [HarmonyPostfix]
+            public static void Postfix(PlayerWeapon __instance)
             {
                 if (!__instance.inHand) return;
                 bool isRight = __instance.rightWeapon;
                 tactsuitVr.Recoil("Blade", isRight);
             }
         }
+        */
 
+        [HarmonyPatch(typeof(PlayerStats), "Die", new Type[] {  })]
+        public class bhaptics_PlayerDies
+        {
+            [HarmonyPostfix]
+            public static void Postfix()
+            {
+                tactsuitVr.StopThreads();
+            }
+        }
+
+        [HarmonyPatch(typeof(PlayerStats), "GainHealth", new Type[] { typeof(float) })]
+        public class bhaptics_GainHealth
+        {
+            [HarmonyPostfix]
+            public static void Postfix()
+            {
+                tactsuitVr.PlaybackHaptics("Healing");
+            }
+        }
+
+        [HarmonyPatch(typeof(PlayerStats), "TakeDamage", new Type[] { typeof(float) })]
+        public class bhaptics_TakeDamage
+        {
+            [HarmonyPostfix]
+            public static void Postfix()
+            {
+                tactsuitVr.PlaybackHaptics("Impact");
+            }
+        }
+
+        [HarmonyPatch(typeof(PlayerStats), "Update", new Type[] {  })]
+        public class bhaptics_HealthUpdate
+        {
+            [HarmonyPostfix]
+            public static void Postfix(PlayerStats __instance)
+            {
+                if (PlayerStats.playerHP <= 0.2f * PlayerStats.maxHP) tactsuitVr.StartHeartBeat();
+                else tactsuitVr.StopHeartBeat();
+            }
+        }
+
+        [HarmonyPatch(typeof(MagicController), "EndSpell", new Type[] { })]
+        public class bhaptics_EndSpell
+        {
+            [HarmonyPostfix]
+            public static void Postfix(MagicController __instance)
+            {
+                tactsuitVr.LOG("Spell: " + __instance.isRightController.ToString() + " " + __instance.element);
+            }
+        }
+
+        [HarmonyPatch(typeof(MagicController_Oculus), "EndSpell", new Type[] { })]
+        public class bhaptics_EndSpellOculus
+        {
+            [HarmonyPostfix]
+            public static void Postfix(MagicController_Oculus __instance)
+            {
+                tactsuitVr.LOG("Oculus Spell: " + __instance.isRightController.ToString() + " " + __instance.element);
+            }
+        }
+
+        [HarmonyPatch(typeof(ControllerInteraction), "FireArrow", new Type[] { })]
+        public class bhaptics_ReleaseBow
+        {
+            [HarmonyPostfix]
+            public static void Postfix(ControllerInteraction __instance)
+            {
+                bool isRight = (__instance.controller.index == SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.Rightmost, Valve.VR.ETrackedDeviceClass.Controller));
+                tactsuitVr.LOG("FireArrow: " + __instance.hand.name + " " + __instance.controller.index.ToString() + " " + isRight.ToString());
+                if (__instance.hand.name == "LeftHand") tactsuitVr.PlaybackHaptics("RecoilBowVest_L");
+                else tactsuitVr.PlaybackHaptics("RecoilBowVest_R");
+            }
+        }
+
+        [HarmonyPatch(typeof(ControllerInteraction), "GrabWeapon", new Type[] { })]
+        public class bhaptics_GrabWeapon
+        {
+            [HarmonyPostfix]
+            public static void Postfix(ControllerInteraction __instance)
+            {
+                //bool isRight = (__instance.controller.index == SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.Rightmost, Valve.VR.ETrackedDeviceClass.Controller));
+                if (__instance.hand.name == "RightHand") bladeInRightHand = true;
+                if (__instance.hand.name == "LeftHand") bladeInRightHand = false;
+                //tactsuitVr.LOG("GrabWeapon: " + __instance.hand.name + " " + __instance.controller.index.ToString() + " " + isRight.ToString());
+            }
+        }
 
     }
 }
