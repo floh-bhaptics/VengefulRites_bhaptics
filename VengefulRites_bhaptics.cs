@@ -113,7 +113,7 @@ namespace VengefulRites_bhaptics
             }
         }
 
-        [HarmonyPatch(typeof(HealingAura), "FinishSpell", new Type[] { typeof(float) })]
+        [HarmonyPatch(typeof(HealingAura), "FinishSpell", new Type[] {  })]
         public class bhaptics_HealingAura
         {
             [HarmonyPostfix]
@@ -123,7 +123,7 @@ namespace VengefulRites_bhaptics
             }
         }
 
-        [HarmonyPatch(typeof(HealingOrb), "SpawnAura", new Type[] { typeof(float) })]
+        [HarmonyPatch(typeof(HealingOrb), "SpawnAura", new Type[] {  })]
         public class bhaptics_HealingOrb
         {
             [HarmonyPostfix]
