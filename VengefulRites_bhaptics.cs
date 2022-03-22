@@ -113,6 +113,26 @@ namespace VengefulRites_bhaptics
             }
         }
 
+        [HarmonyPatch(typeof(HealingAura), "FinishSpell", new Type[] { typeof(float) })]
+        public class bhaptics_HealingAura
+        {
+            [HarmonyPostfix]
+            public static void Postfix()
+            {
+                tactsuitVr.PlaybackHaptics("Healing");
+            }
+        }
+
+        [HarmonyPatch(typeof(HealingOrb), "SpawnAura", new Type[] { typeof(float) })]
+        public class bhaptics_HealingOrb
+        {
+            [HarmonyPostfix]
+            public static void Postfix()
+            {
+                tactsuitVr.PlaybackHaptics("Healing");
+            }
+        }
+
         [HarmonyPatch(typeof(PlayerStats), "TakeDamage", new Type[] { typeof(float) })]
         public class bhaptics_TakeDamage
         {
@@ -134,25 +154,70 @@ namespace VengefulRites_bhaptics
             }
         }
 
-        [HarmonyPatch(typeof(MagicController), "EndSpell", new Type[] { })]
-        public class bhaptics_EndSpell
+        [HarmonyPatch(typeof(MagicController), "BeginKinesis", new Type[] { })]
+        public class bhaptics_BeginKinesis
         {
             [HarmonyPostfix]
             public static void Postfix(MagicController __instance)
             {
-                tactsuitVr.LOG("Spell: " + __instance.isRightController.ToString() + " " + __instance.element);
+                tactsuitVr.StartTelekinesis(__instance.isRightController);
             }
         }
 
-        [HarmonyPatch(typeof(MagicController_Oculus), "EndSpell", new Type[] { })]
-        public class bhaptics_EndSpellOculus
+        [HarmonyPatch(typeof(MagicController), "EndKinesis", new Type[] { })]
+        public class bhaptics_EndKinesis
         {
             [HarmonyPostfix]
-            public static void Postfix(MagicController_Oculus __instance)
+            public static void Postfix(MagicController __instance)
             {
-                tactsuitVr.LOG("Oculus Spell: " + __instance.isRightController.ToString() + " " + __instance.element);
+                tactsuitVr.StopTelekinesis(__instance.isRightController);
             }
         }
+
+        [HarmonyPatch(typeof(MagicController), "ConjureFireball", new Type[] { })]
+        public class bhaptics_Fireball
+        {
+            [HarmonyPostfix]
+            public static void Postfix(MagicController __instance)
+            {
+                //tactsuitVr.LOG("Fireball: " + __instance.isRightController.ToString() + " " + __instance.element);
+                tactsuitVr.Spell("Fire", __instance.isRightController);
+            }
+        }
+
+        [HarmonyPatch(typeof(MagicController), "ConjureHealingOrb", new Type[] { })]
+        public class bhaptics_HealingOrbConjure
+        {
+            [HarmonyPostfix]
+            public static void Postfix(MagicController __instance)
+            {
+                //tactsuitVr.LOG("Fireball: " + __instance.isRightController.ToString() + " " + __instance.element);
+                tactsuitVr.Spell("Heal", __instance.isRightController);
+            }
+        }
+
+        [HarmonyPatch(typeof(MagicController), "ConjureProtectionOrb", new Type[] { })]
+        public class bhaptics_Shield
+        {
+            [HarmonyPostfix]
+            public static void Postfix(MagicController __instance)
+            {
+                //tactsuitVr.LOG("Fireball: " + __instance.isRightController.ToString() + " " + __instance.element);
+                tactsuitVr.Spell("Shield", __instance.isRightController);
+            }
+        }
+
+        [HarmonyPatch(typeof(MagicController), "ConjureStoneSkin", new Type[] { })]
+        public class bhaptics_StoneSkin
+        {
+            [HarmonyPostfix]
+            public static void Postfix(MagicController __instance)
+            {
+                //tactsuitVr.LOG("Fireball: " + __instance.isRightController.ToString() + " " + __instance.element);
+                tactsuitVr.Spell("Fire", __instance.isRightController);
+            }
+        }
+
 
         [HarmonyPatch(typeof(ControllerInteraction), "FireArrow", new Type[] { })]
         public class bhaptics_ReleaseBow
@@ -160,8 +225,8 @@ namespace VengefulRites_bhaptics
             [HarmonyPostfix]
             public static void Postfix(ControllerInteraction __instance)
             {
-                bool isRight = (__instance.controller.index == SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.Rightmost, Valve.VR.ETrackedDeviceClass.Controller));
-                tactsuitVr.LOG("FireArrow: " + __instance.hand.name + " " + __instance.controller.index.ToString() + " " + isRight.ToString());
+                //bool isRight = (__instance.controller.index == SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.Rightmost, Valve.VR.ETrackedDeviceClass.Controller));
+                //tactsuitVr.LOG("FireArrow: " + __instance.hand.name + " " + __instance.controller.index.ToString() + " " + isRight.ToString());
                 if (__instance.hand.name == "LeftHand") tactsuitVr.PlaybackHaptics("RecoilBowVest_L");
                 else tactsuitVr.PlaybackHaptics("RecoilBowVest_R");
             }

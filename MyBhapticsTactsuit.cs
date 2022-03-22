@@ -19,6 +19,8 @@ namespace MyBhapticsTactsuit
         public bool systemInitialized = false;
         // Event to start and stop the heartbeat thread
         private static ManualResetEvent HeartBeat_mrse = new ManualResetEvent(false);
+        private static ManualResetEvent TelKinL_mrse = new ManualResetEvent(false);
+        private static ManualResetEvent TelKinR_mrse = new ManualResetEvent(false);
         // dictionary of all feedback patterns found in the bHaptics directory
         public Dictionary<String, FileInfo> FeedbackMap = new Dictionary<String, FileInfo>();
 
@@ -34,6 +36,29 @@ namespace MyBhapticsTactsuit
                 Thread.Sleep(600);
             }
         }
+        public void TelKinLFunc()
+        {
+            while (true)
+            {
+                // Check if reset event is active
+                TelKinL_mrse.WaitOne();
+                bHaptics.SubmitRegistered("TelekinesisArm_L");
+                bHaptics.SubmitRegistered("TelekinesisHand_L");
+                Thread.Sleep(1020);
+            }
+        }
+
+        public void TelKinRFunc()
+        {
+            while (true)
+            {
+                // Check if reset event is active
+                TelKinR_mrse.WaitOne();
+                bHaptics.SubmitRegistered("TelekinesisArm_R");
+                bHaptics.SubmitRegistered("TelekinesisHand_R");
+                Thread.Sleep(1020);
+            }
+        }
 
         public TactsuitVR()
         {
@@ -46,6 +71,10 @@ namespace MyBhapticsTactsuit
             LOG("Starting HeartBeat thread...");
             Thread HeartBeatThread = new Thread(HeartBeatFunc);
             HeartBeatThread.Start();
+            Thread TelKinLThread = new Thread(TelKinLFunc);
+            TelKinLThread.Start();
+            Thread TelKinRThread = new Thread(TelKinRFunc);
+            TelKinRThread.Start();
         }
 
         public void LOG(string logStr)
@@ -246,6 +275,28 @@ namespace MyBhapticsTactsuit
             HeartBeat_mrse.Reset();
         }
 
+        public void StartTelekinesis(bool isRight)
+        {
+            if (isRight) TelKinR_mrse.Set();
+            else TelKinL_mrse.Set();
+        }
+
+        public void StopTelekinesis(bool isRight)
+        {
+            if (isRight)
+            {
+                TelKinR_mrse.Reset();
+                StopHapticFeedback("TelekinesisArm_R");
+                StopHapticFeedback("TelekinesisHand_R");
+            }
+            else
+            {
+                TelKinL_mrse.Reset();
+                StopHapticFeedback("TelekinesisArm_L");
+                StopHapticFeedback("TelekinesisHand_L");
+            }
+        }
+
         public bool IsPlaying(String effect)
         {
             return bHaptics.IsPlaying(effect);
@@ -270,6 +321,8 @@ namespace MyBhapticsTactsuit
             // Yes, looks silly here, but if you have several threads like this, this is
             // very useful when the player dies or starts a new level
             StopHeartBeat();
+            StopTelekinesis(true);
+            StopTelekinesis(false);
         }
 
 
