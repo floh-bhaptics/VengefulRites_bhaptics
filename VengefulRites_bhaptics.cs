@@ -15,6 +15,7 @@ namespace VengefulRites_bhaptics
     {
         public static TactsuitVR tactsuitVr;
         public static bool bladeInRightHand = true;
+        public static bool pickaxeInRightHand = true;
 
         public override void OnApplicationStart()
         {
@@ -49,6 +50,20 @@ namespace VengefulRites_bhaptics
                 // tactsuitVr.LOG("Parry: " + __instance.rightWeapon.ToString());
                 bool isRight = __instance.rightWeapon;
                 tactsuitVr.Recoil("Blade", bladeInRightHand);
+            }
+        }
+
+        [HarmonyPatch(typeof(Pickaxe), "OnTriggerEnter", new Type[] { typeof(Collider) })]
+        public class bhaptics_HitPickaxe
+        {
+            [HarmonyPostfix]
+            public static void Postfix(Pickaxe __instance, Collider other)
+            {
+                //tactsuitVr.LOG("Other:" + other.isTrigger + " " + other.name + "End" + other.attachedRigidbody.name);
+                if (other.isTrigger) return;
+                if (other.name.Contains("Player")) return;
+                if (other.name.Contains("Camera")) return;
+                tactsuitVr.Recoil("Blade", pickaxeInRightHand);
             }
         }
 
@@ -244,6 +259,22 @@ namespace VengefulRites_bhaptics
                 //tactsuitVr.LOG("GrabWeapon: " + __instance.hand.name + " " + __instance.controller.index.ToString() + " " + isRight.ToString());
             }
         }
+
+        [HarmonyPatch(typeof(ControllerInteraction), "GrabObject", new Type[] { })]
+        public class bhaptics_GrabObject
+        {
+            [HarmonyPostfix]
+            public static void Postfix(ControllerInteraction __instance)
+            {
+                //bool isRight = (__instance.controller.index == SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.Rightmost, Valve.VR.ETrackedDeviceClass.Controller));
+                //tactsuitVr.LOG("Object: " + __instance.heldObject.name);
+                if (!__instance.heldObject.name.Contains("Pickaxe")) return;
+                if (__instance.hand.name == "RightHand") pickaxeInRightHand = true;
+                if (__instance.hand.name == "LeftHand") pickaxeInRightHand = false;
+                //tactsuitVr.LOG("GrabWeapon: " + __instance.hand.name + " " + __instance.controller.index.ToString() + " " + isRight.ToString());
+            }
+        }
+
 
     }
 }
