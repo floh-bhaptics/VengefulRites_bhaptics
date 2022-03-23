@@ -24,6 +24,8 @@ namespace VengefulRites_bhaptics
             tactsuitVr.PlaybackHaptics("HeartBeat");
         }
 
+        #region Swordplay
+
         [HarmonyPatch(typeof(PlayerWeapon), "OnTriggerEnter", new Type[] { typeof(Collider) })]
         public class bhaptics_PlayerWeaponDrawBlood
         {
@@ -67,46 +69,9 @@ namespace VengefulRites_bhaptics
             }
         }
 
-        /*
-        [HarmonyPatch(typeof(PlayerWeapon), "PlushieHit", new Type[] { })]
-        public class bhaptics_PlayerWeaponPlushieHit
-        {
-            [HarmonyPostfix]
-            public static void Postfix(PlayerWeapon __instance)
-            {
-                if (!__instance.inHand) return;
-                // tactsuitVr.LOG("Plushie: " + __instance.rightWeapon.ToString());
-                bool isRight = __instance.rightWeapon;
-                tactsuitVr.Recoil("Blade", isRight, 0.2f);
-            }
-        }
+        #endregion
 
-        [HarmonyPatch(typeof(PlayerWeapon), "WeakHit", new Type[] { })]
-        public class bhaptics_PlayerWeaponWeakHit
-        {
-            [HarmonyPostfix]
-            public static void Postfix(PlayerWeapon __instance)
-            {
-                if (!__instance.inHand) return;
-                // tactsuitVr.LOG("Weak: " + __instance.rightWeapon.ToString());
-                bool isRight = __instance.rightWeapon;
-                tactsuitVr.Recoil("Blade", isRight, 0.4f);
-            }
-        }
-        */
-        /*
-        [HarmonyPatch(typeof(PlayerWeapon), "ApplyEffect", new Type[] { typeof(EnemyController), typeof(Transform), typeof(float) })]
-        public class bhaptics_PlayerWeaponApplyEffect
-        {
-            [HarmonyPostfix]
-            public static void Postfix(PlayerWeapon __instance)
-            {
-                if (!__instance.inHand) return;
-                bool isRight = __instance.rightWeapon;
-                tactsuitVr.Recoil("Blade", isRight);
-            }
-        }
-        */
+        #region Health, Damage, and Death
 
         [HarmonyPatch(typeof(PlayerStats), "Die", new Type[] {  })]
         public class bhaptics_PlayerDies
@@ -169,6 +134,10 @@ namespace VengefulRites_bhaptics
             }
         }
 
+        #endregion
+
+        #region Magic
+
         [HarmonyPatch(typeof(MagicController), "BeginKinesis", new Type[] { })]
         public class bhaptics_BeginKinesis
         {
@@ -176,6 +145,16 @@ namespace VengefulRites_bhaptics
             public static void Postfix(MagicController __instance)
             {
                 tactsuitVr.StartTelekinesis(__instance.isRightController);
+            }
+        }
+
+        [HarmonyPatch(typeof(KineticThrust), "PerformThrust", new Type[] { })]
+        public class bhaptics_KineticThrust
+        {
+            [HarmonyPostfix]
+            public static void Postfix(KineticThrust __instance)
+            {
+                tactsuitVr.PlaybackHaptics("KineticThrust");
             }
         }
 
@@ -233,6 +212,73 @@ namespace VengefulRites_bhaptics
             }
         }
 
+        [HarmonyPatch(typeof(MagicController_Oculus), "BeginKinesis", new Type[] { })]
+        public class bhaptics_BeginKinesisOculus
+        {
+            [HarmonyPostfix]
+            public static void Postfix(MagicController_Oculus __instance)
+            {
+                tactsuitVr.StartTelekinesis(__instance.isRightController);
+            }
+        }
+
+        [HarmonyPatch(typeof(MagicController_Oculus), "EndKinesis", new Type[] { })]
+        public class bhaptics_EndKinesisOculus
+        {
+            [HarmonyPostfix]
+            public static void Postfix(MagicController_Oculus __instance)
+            {
+                tactsuitVr.StopTelekinesis(__instance.isRightController);
+            }
+        }
+
+        [HarmonyPatch(typeof(MagicController_Oculus), "ConjureFireball", new Type[] { })]
+        public class bhaptics_FireballOculus
+        {
+            [HarmonyPostfix]
+            public static void Postfix(MagicController_Oculus __instance)
+            {
+                //tactsuitVr.LOG("Fireball: " + __instance.isRightController.ToString() + " " + __instance.element);
+                tactsuitVr.Spell("Fire", __instance.isRightController);
+            }
+        }
+
+        [HarmonyPatch(typeof(MagicController_Oculus), "ConjureHealingOrb", new Type[] { })]
+        public class bhaptics_HealingOrbConjureOculus
+        {
+            [HarmonyPostfix]
+            public static void Postfix(MagicController_Oculus __instance)
+            {
+                //tactsuitVr.LOG("Fireball: " + __instance.isRightController.ToString() + " " + __instance.element);
+                tactsuitVr.Spell("Heal", __instance.isRightController);
+            }
+        }
+
+        [HarmonyPatch(typeof(MagicController_Oculus), "ConjureProtectionOrb", new Type[] { })]
+        public class bhaptics_ShieldOculus
+        {
+            [HarmonyPostfix]
+            public static void Postfix(MagicController_Oculus __instance)
+            {
+                //tactsuitVr.LOG("Fireball: " + __instance.isRightController.ToString() + " " + __instance.element);
+                tactsuitVr.Spell("Shield", __instance.isRightController);
+            }
+        }
+
+        [HarmonyPatch(typeof(MagicController_Oculus), "ConjureStoneSkin", new Type[] { })]
+        public class bhaptics_StoneSkinOculus
+        {
+            [HarmonyPostfix]
+            public static void Postfix(MagicController_Oculus __instance)
+            {
+                //tactsuitVr.LOG("Fireball: " + __instance.isRightController.ToString() + " " + __instance.element);
+                tactsuitVr.Spell("Fire", __instance.isRightController);
+            }
+        }
+
+        #endregion
+
+        #region Controller interaction
 
         [HarmonyPatch(typeof(ControllerInteraction), "FireArrow", new Type[] { })]
         public class bhaptics_ReleaseBow
@@ -275,6 +321,47 @@ namespace VengefulRites_bhaptics
             }
         }
 
+        [HarmonyPatch(typeof(ControllerInteraction_Oculus), "FireArrow", new Type[] { })]
+        public class bhaptics_ReleaseBowOculus
+        {
+            [HarmonyPostfix]
+            public static void Postfix(ControllerInteraction_Oculus __instance)
+            {
+                //bool isRight = (__instance.controller.index == SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.Rightmost, Valve.VR.ETrackedDeviceClass.Controller));
+                //tactsuitVr.LOG("FireArrow: " + __instance.hand.name + " " + __instance.controller.index.ToString() + " " + isRight.ToString());
+                if (__instance.hand.name == "LeftHand") tactsuitVr.PlaybackHaptics("RecoilBowVest_L");
+                else tactsuitVr.PlaybackHaptics("RecoilBowVest_R");
+            }
+        }
 
+        [HarmonyPatch(typeof(ControllerInteraction_Oculus), "GrabWeapon", new Type[] { })]
+        public class bhaptics_GrabWeaponOculus
+        {
+            [HarmonyPostfix]
+            public static void Postfix(ControllerInteraction_Oculus __instance)
+            {
+                //bool isRight = (__instance.controller.index == SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.Rightmost, Valve.VR.ETrackedDeviceClass.Controller));
+                if (__instance.hand.name == "RightHand") bladeInRightHand = true;
+                if (__instance.hand.name == "LeftHand") bladeInRightHand = false;
+                //tactsuitVr.LOG("GrabWeapon: " + __instance.hand.name + " " + __instance.controller.index.ToString() + " " + isRight.ToString());
+            }
+        }
+
+        [HarmonyPatch(typeof(ControllerInteraction_Oculus), "GrabObject", new Type[] { })]
+        public class bhaptics_GrabObjectOculus
+        {
+            [HarmonyPostfix]
+            public static void Postfix(ControllerInteraction_Oculus __instance)
+            {
+                //bool isRight = (__instance.controller.index == SteamVR_Controller.GetDeviceIndex(SteamVR_Controller.DeviceRelation.Rightmost, Valve.VR.ETrackedDeviceClass.Controller));
+                //tactsuitVr.LOG("Object: " + __instance.heldObject.name);
+                if (!__instance.heldObject.name.Contains("Pickaxe")) return;
+                if (__instance.hand.name == "RightHand") pickaxeInRightHand = true;
+                if (__instance.hand.name == "LeftHand") pickaxeInRightHand = false;
+                //tactsuitVr.LOG("GrabWeapon: " + __instance.hand.name + " " + __instance.controller.index.ToString() + " " + isRight.ToString());
+            }
+        }
+
+        #endregion
     }
 }
