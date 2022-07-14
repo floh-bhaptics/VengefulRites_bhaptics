@@ -153,6 +153,7 @@ namespace VengefulRites_bhaptics
             [HarmonyPostfix]
             public static void Postfix(MagicController __instance)
             {
+                if (__instance.grapplePoint != null) return;
                 tactsuitVr.StartTelekinesis(__instance.isRightController);
             }
         }
@@ -193,7 +194,6 @@ namespace VengefulRites_bhaptics
             [HarmonyPostfix]
             public static void Postfix(MagicController __instance)
             {
-                //tactsuitVr.LOG("Fireball: " + __instance.isRightController.ToString() + " " + __instance.element);
                 tactsuitVr.Spell("Heal", __instance.isRightController);
             }
         }
@@ -204,7 +204,6 @@ namespace VengefulRites_bhaptics
             [HarmonyPostfix]
             public static void Postfix(MagicController __instance)
             {
-                //tactsuitVr.LOG("Fireball: " + __instance.isRightController.ToString() + " " + __instance.element);
                 tactsuitVr.Spell("Shield", __instance.isRightController);
             }
         }
@@ -215,7 +214,6 @@ namespace VengefulRites_bhaptics
             [HarmonyPostfix]
             public static void Postfix(MagicController __instance)
             {
-                //tactsuitVr.LOG("Fireball: " + __instance.isRightController.ToString() + " " + __instance.element);
                 tactsuitVr.Spell("Fire", __instance.isRightController);
             }
         }
@@ -226,6 +224,7 @@ namespace VengefulRites_bhaptics
             [HarmonyPostfix]
             public static void Postfix(MagicController_Oculus __instance)
             {
+                if (__instance.grapplePoint != null) return;
                 tactsuitVr.StartTelekinesis(__instance.isRightController);
             }
         }
@@ -256,7 +255,6 @@ namespace VengefulRites_bhaptics
             [HarmonyPostfix]
             public static void Postfix(MagicController_Oculus __instance)
             {
-                //tactsuitVr.LOG("Fireball: " + __instance.isRightController.ToString() + " " + __instance.element);
                 tactsuitVr.Spell("Heal", __instance.isRightController);
             }
         }
@@ -267,7 +265,6 @@ namespace VengefulRites_bhaptics
             [HarmonyPostfix]
             public static void Postfix(MagicController_Oculus __instance)
             {
-                //tactsuitVr.LOG("Fireball: " + __instance.isRightController.ToString() + " " + __instance.element);
                 tactsuitVr.Spell("Shield", __instance.isRightController);
             }
         }
@@ -278,7 +275,6 @@ namespace VengefulRites_bhaptics
             [HarmonyPostfix]
             public static void Postfix(MagicController_Oculus __instance)
             {
-                //tactsuitVr.LOG("Fireball: " + __instance.isRightController.ToString() + " " + __instance.element);
                 tactsuitVr.Spell("Fire", __instance.isRightController);
             }
         }

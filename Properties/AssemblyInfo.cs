@@ -23,7 +23,7 @@ using MelonLoader;
 // Die folgende GUID bestimmt die ID der Typbibliothek, wenn dieses Projekt für COM verfügbar gemacht wird
 [assembly: Guid("dbc84fda-b20d-4e87-a2a2-5fd074f0385c")]
 
-[assembly: MelonInfo(typeof(VengefulRites_bhaptics.VengefulRites_bhaptics), "VengefulRites_bhaptics", "1.3.1", "Florian Fahrenberger")]
+[assembly: MelonInfo(typeof(VengefulRites_bhaptics.VengefulRites_bhaptics), "VengefulRites_bhaptics", "1.3.2", "Florian Fahrenberger")]
 [assembly: MelonGame("Deep Dive Interactive", "Vengeful Rites")]
 
 // Versionsinformationen für eine Assembly bestehen aus den folgenden vier Werten:
@@ -36,5 +36,5 @@ using MelonLoader;
 // Sie können alle Werte angeben oder Standardwerte für die Build- und Revisionsnummern verwenden,
 // indem Sie "*" wie unten gezeigt eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.3.1")]
-[assembly: AssemblyFileVersion("1.3.1")]
+[assembly: AssemblyVersion("1.3.2")]
+[assembly: AssemblyFileVersion("1.3.2")]
