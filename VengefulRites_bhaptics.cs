@@ -9,6 +9,9 @@ using HarmonyLib;
 using UnityEngine;
 using MyBhapticsTactsuit;
 
+[assembly: MelonInfo(typeof(VengefulRites_bhaptics.VengefulRites_bhaptics), "VengefulRites_bhaptics", "2.0.0", "Florian Fahrenberger")]
+[assembly: MelonGame("Deep Dive Interactive", "Vengeful Rites")]
+
 namespace VengefulRites_bhaptics
 {
     public class VengefulRites_bhaptics : MelonMod
@@ -17,9 +20,8 @@ namespace VengefulRites_bhaptics
         public static bool bladeInRightHand = true;
         public static bool pickaxeInRightHand = true;
 
-        public override void OnApplicationStart()
+        public override void OnInitializeMelon()
         {
-            base.OnApplicationStart();
             tactsuitVr = new TactsuitVR();
             tactsuitVr.PlaybackHaptics("HeartBeat");
         }
